@@ -1,0 +1,20 @@
+[
+    {
+        "caption": "Tools",
+        "mnemonic": "T",
+        "id": "tools",
+        "children":
+        [
+            {
+                "caption": "Log Helper",
+                "mnemonic": "L",
+                "id": "loghelpermenu",
+                "children":
+                [
+                    { "command": "format_log", "caption": "Format Logs" },
+                    { "command": "filter_log", "caption": "Filter Logs" }
+                ]
+            }
+        ]
+    }
+]

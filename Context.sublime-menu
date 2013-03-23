@@ -1,0 +1,4 @@
+[
+    { "command": "format_log", "caption": "Format Logs" },
+    { "command": "filter_log", "caption": "Filter Logs" }
+]

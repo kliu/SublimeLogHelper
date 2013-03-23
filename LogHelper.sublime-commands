@@ -1,0 +1,10 @@
+[
+    {
+        "caption": "LogHelper: Format Logs",
+        "command": "format_log"
+    },
+    {
+        "caption": "LogHelper: Filter Logs",
+        "command": "filter_log"
+    }
+]
