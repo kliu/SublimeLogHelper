@@ -1,16 +1,15 @@
 import sublime
 import sublime_plugin
-import os
+import subprocess
 
 class FormatLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         file_path = self.view.file_name()
         if file_path and len(file_path) > 0:
-            folder_name, file_name = os.path.split(self.view.file_name())
-            self.view.window().run_command('exec', {'cmd': ['ruby', '-pi', '-e', 'gsub(/\\\\r\\\\n|\\\\n\\\\n/, "\n")', file_path], 'working_dir': folder_name})
-            self.view.window().run_command('exec', {'cmd': ['ruby', '-pi', '-e', 'gsub("\\\\n", "")', file_path], 'working_dir': folder_name})
-            self.view.window().run_command('exec', {'cmd': ['ruby', '-pi', '-e', 'gsub("\\\\s", "/")', file_path], 'working_dir': folder_name})
-            self.view.window().run_command('exec', {'cmd': ['ruby', '-pi', '-e', 'gsub("\\\\t", "    ")', file_path], 'working_dir': folder_name})
+            subprocess.call(['ruby', '-pi', '-e', 'gsub(/\\\\r\\\\n|\\\\n\\\\n/, "\n")', file_path])
+            subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\n", "")', file_path])
+            subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\s", "/")', file_path])
+            subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\t", "    ")', file_path])
         else:
             replacements = self.view.find_all("\\\\r\\\\n|\\\\n\\\\n")
             replacements.reverse()
