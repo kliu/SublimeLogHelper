@@ -3,10 +3,12 @@ import sublime_plugin
 import subprocess
 import functools
 
+settings = sublime.load_settings('LogHelper.sublime-settings')
+
 class FormatLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         file_path = self.view.file_name()
-        if file_path and len(file_path) > 0:
+        if file_path and len(file_path) > 0 and settings.get('automatic_save_formated_file'):
             subprocess.call(['ruby', '-pi', '-e', 'gsub(/\\\\r\\\\n|\\\\n\\\\n/, "\n")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\n", "")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\s", "/")', file_path])
