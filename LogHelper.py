@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import subprocess
+import functools
 
 class FormatLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -10,6 +11,7 @@ class FormatLogCommand(sublime_plugin.TextCommand):
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\n", "")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\s", "/")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\t", "    ")', file_path])
+            sublime.set_timeout(functools.partial(self.view.run_command, 'revert'), 0)
         else:
             replacements = self.view.find_all("\\\\r\\\\n|\\\\n\\\\n")
             replacements.reverse()
