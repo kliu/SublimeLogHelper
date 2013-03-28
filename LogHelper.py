@@ -9,28 +9,22 @@ class FormatLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         file_path = self.view.file_name()
         if file_path and len(file_path) > 0 and settings.get('automatic_save_formated_file'):
-            subprocess.call(['ruby', '-pi', '-e', 'gsub(/\\\\r\\\\n|\\\\n\\\\n/, "\n")', file_path])
-            subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\n", "")', file_path])
+            subprocess.call(['ruby', '-pi', '-e', 'gsub(/\\\\r\\\\n|\\\\n\\\\n|\\\\n/, "\n")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\s", "/")', file_path])
             subprocess.call(['ruby', '-pi', '-e', 'gsub("\\\\t", "    ")', file_path])
             sublime.set_timeout(functools.partial(self.view.run_command, 'revert'), 0)
         else:
-            replacements = self.view.find_all("\\\\r\\\\n|\\\\n\\\\n")
+            replacements = self.view.find_all(r"\\r\\n|\\n\\n|\\n")
             replacements.reverse()
             for replacement in replacements:
                 self.view.replace(edit, replacement, "\n")
 
-            replacements = self.view.find_all("\\\\n")
-            replacements.reverse()
-            for replacement in replacements:
-                self.view.erase(edit, replacement)
-
-            replacements = self.view.find_all("\\\\s")
+            replacements = self.view.find_all(r"\\s")
             replacements.reverse()
             for replacement in replacements:
                 self.view.replace(edit, replacement, "/")
 
-            replacements = self.view.find_all("\\\\t")
+            replacements = self.view.find_all(r"\\t")
             replacements.reverse()
             for replacement in replacements:
                 self.view.replace(edit, replacement, "    ")
@@ -38,23 +32,29 @@ class FormatLogCommand(sublime_plugin.TextCommand):
 
 class FilterLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        selection = self.view.sel()[0]
-        if len(selection) != 0:
-            word = self.view.substr(selection)
-        if word and len(word) > 0:
-            region = sublime.Region(0, self.view.size())
-            lines = self.view.split_by_newlines(region)
-            scratch = self.view.window().new_file()
-            scratch.set_scratch(True)
-            scratch_edit = scratch.begin_edit('file_temp')
-            for line in lines:
-                lineStr = self.view.substr(line)
+        words = set()
+        for selection in self.view.sel():
+            if selection.size() != 0:
+                words.add(self.view.substr(selection))
+        region = sublime.Region(0, self.view.size())
+        lines = self.view.split_by_newlines(region)
+        lines.reverse()
+        scratch = self.view.window().new_file()
+        scratch.set_scratch(True)
+        scratch_edit = scratch.begin_edit('file_temp')
+        for line in lines:
+            lineStr = self.view.substr(line)
+            for word in words:
                 if word in lineStr:
                     scratch.insert(scratch_edit, 0, lineStr + "\n")
-            scratch.end_edit(scratch_edit)
+        scratch.end_edit(scratch_edit)
 
     def is_enabled(self):
-        return self.view.sel()[0] and len(self.view.sel()[0]) > 0
+        for region in self.view.sel():
+            if region.size() != 0:
+                return True;
+        return False;
+
 
 # def encode(text):
 #     return base64.b64encode(text)
